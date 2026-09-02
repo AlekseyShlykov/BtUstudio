@@ -57,6 +57,7 @@
 .cases-page .case-copy{width:min(100%,860px)}
 .cases-page .case.reverse .case-copy{margin-left:auto}
 .cases-page .case-index{box-shadow:0 0 0 1px rgba(32,32,28,.18)}
+.cases-page .case-visual-link{margin-top:0}
 @media(max-width:800px){.cases-page{padding-left:0;padding-right:0}.cases-page .case,.cases-page .case.reverse{gap:0;padding:40px 16px 72px}.cases-page .case-visual{height:auto;max-height:none;margin-bottom:24px}.cases-page .case-index{top:10px;left:10px}.cases-page .case-copy{width:100%}.cases-page dl{margin:28px 0}}
 @media(max-width:800px){.team-standalone{padding-top:110px}}
 @media(min-width:801px){.site-header{position:fixed;transition:transform .28s ease,background-color .2s ease,box-shadow .2s ease;will-change:transform}.site-header.nav-hidden{transform:translateY(-100%)}.site-header.nav-scrolled{background:rgba(241,237,223,.96);box-shadow:0 1px 0 var(--line);backdrop-filter:blur(10px)}}
@@ -103,3 +104,47 @@ blockquote br{display:block;content:"";margin-top:.22em}
 .hidden-clue span:after{content:'with code Curiosity';display:block;margin-top:5px;font:normal 14px/1.25 var(--sans)}
 .cases-page .case,.cases-page .case.reverse,.cases-page .case:nth-child(4){border-top:0;border-bottom:0}
 .footer-playground,.inner-header{border-top:0;border-bottom:0}
+
+@media(min-width:801px){
+  .cases-page .case,.cases-page .case.reverse{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    column-gap:clamp(36px,5vw,88px);
+    row-gap:clamp(28px,3vw,44px);
+    align-items:start;
+  }
+  .cases-page .case-type{
+    grid-column:1/-1;
+    width:100%;
+    margin:0;
+    text-align:center;
+  }
+  .cases-page .case-visual{
+    grid-column:1;
+    grid-row:2;
+    width:100%;
+    max-width:none;
+    margin:0;
+  }
+  .cases-page .case-copy{
+    grid-column:2;
+    grid-row:2;
+    width:100%;
+    margin:0;
+  }
+  .cases-page .case-visual-link{
+    grid-column:1;
+    grid-row:3;
+    justify-self:start;
+  }
+  .cases-page .case.reverse .case-copy{
+    grid-column:1;
+    margin:0;
+  }
+  .cases-page .case.reverse .case-visual{
+    grid-column:2;
+    grid-row:2;
+  }
+  .cases-page .case.reverse .case-visual-link{
+    grid-column:2;
+  }
+}
