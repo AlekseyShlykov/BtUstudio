@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption:wght@400;700&amp;family=PT+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
-  <script>const palette = new URLSearchParams(location.search).get('palette') || '1'; document.documentElement.dataset.palette = /^(1|3|5|7)$/.test(palette) ? palette : '1';</script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,10 +19,6 @@
       <a href="#about">How we work</a>
       <a href="cases.html">Cases</a>
       <a href="team.html">Team</a>
-      <a class="palette-link" data-palette-link="1" href="index.html?palette=1" aria-label="Color palette 1">1</a>
-      <a class="palette-link" data-palette-link="3" href="index.html?palette=3" aria-label="Color palette 3">3</a>
-      <a class="palette-link" data-palette-link="5" href="index.html?palette=5" aria-label="Color palette 5">5</a>
-      <a class="palette-link" data-palette-link="7" href="index.html?palette=7" aria-label="Color palette 7">7</a>
       <a class="nav-cta" href="#contact">Start a project</a>
     </nav>
   </header>
@@ -58,7 +53,6 @@
       <div class="sticky-intro">
         <p class="section-label">How we work</p>
         <h2>From a subject<br>to an experience.</h2>
-        <p>One clear route, with room to explore.</p>
       </div>
       <ol class="steps">
         <li class="reveal">
@@ -95,7 +89,7 @@
     </section>
 
     <section class="contact chapter" id="contact" data-chapter="06">
-      <div class="contact-intro reveal"><p class="section-label">Start a conversation</p><h2>What should people understand?</h2><p>Tell us a little about the subject, the audience and where the finished work will live. Rough ideas are welcome.</p></div>
+      <div class="contact-intro reveal"><h2>What should people understand?</h2><p>Tell us a little about the subject, the audience and where the finished work will live. Rough ideas are welcome.</p></div>
       <form id="contact-form" class="reveal">
         <label>Your name<input name="name" autocomplete="name" required placeholder="Jane Smith"></label>
         <label>Email<input name="email" type="email" autocomplete="email" required placeholder="jane@museum.org"></label>

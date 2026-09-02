@@ -7,8 +7,6 @@ const route = document.querySelector('.hero-visual .route');
 const routeMarker = document.querySelector('.hero-visual .route-marker');
 const processSteps = document.querySelectorAll('.steps li');
 const manifestoDot = document.querySelector('.manifesto-dot');
-const activePalette = document.documentElement.dataset.palette;
-document.querySelector(`[data-palette-link="${activePalette}"]`)?.setAttribute('aria-current', 'true');
 let routeFrame;
 let previousScrollY = scrollY;
 
