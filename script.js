@@ -7,6 +7,8 @@ const route = document.querySelector('.hero-visual .route');
 const routeMarker = document.querySelector('.hero-visual .route-marker');
 const processSteps = document.querySelectorAll('.steps li');
 const manifestoDot = document.querySelector('.manifesto-dot');
+const activePalette = document.documentElement.dataset.palette;
+document.querySelector(`[data-palette-link="${activePalette}"]`)?.setAttribute('aria-current', 'true');
 let routeFrame;
 let previousScrollY = scrollY;
 
@@ -70,10 +72,6 @@ const updateManifestoDot = () => {
   const travel = Math.max(section.offsetHeight * 0.65, 1);
   const amount = Math.min(1, Math.max(0, (scrollY - section.offsetTop) / travel));
   manifestoDot.style.setProperty('--dot-progress', amount.toFixed(3));
-  const startColor = [239, 121, 103];
-  const endColor = [217, 67, 47];
-  const color = startColor.map((channel, index) => Math.round(channel + (endColor[index] - channel) * amount));
-  manifestoDot.style.setProperty('--dot-color', `rgb(${color.join(' ')})`);
 };
 
 addEventListener('scroll', () => {

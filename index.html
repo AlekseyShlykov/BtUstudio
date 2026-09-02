@@ -7,7 +7,8 @@
   <title>Build to Understand Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption:wght@400;700&amp;family=PT+Sans:wght@400;700&amp;display=swap" rel="stylesheet">
+  <script>const palette = new URLSearchParams(location.search).get('palette') || '1'; document.documentElement.dataset.palette = /^(1|3|5|7)$/.test(palette) ? palette : '1';</script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,11 +19,11 @@
     <nav id="site-nav" aria-label="Main navigation">
       <a href="#about">How we work</a>
       <a href="cases.html">Cases</a>
-      <a href="cases-newspaper.html">Newspaper</a>
-      <a href="index-font-1.html" aria-label="Homepage font variant 1">1</a>
-      <a href="index-font-2.html" aria-label="Homepage font variant 2">2</a>
-      <a href="index-font-3.html" aria-label="Homepage font variant 3">3</a>
       <a href="team.html">Team</a>
+      <a class="palette-link" data-palette-link="1" href="index.html?palette=1" aria-label="Color palette 1">1</a>
+      <a class="palette-link" data-palette-link="3" href="index.html?palette=3" aria-label="Color palette 3">3</a>
+      <a class="palette-link" data-palette-link="5" href="index.html?palette=5" aria-label="Color palette 5">5</a>
+      <a class="palette-link" data-palette-link="7" href="index.html?palette=7" aria-label="Color palette 7">7</a>
       <a class="nav-cta" href="#contact">Start a project</a>
     </nav>
   </header>
