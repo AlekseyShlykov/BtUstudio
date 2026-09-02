@@ -7,7 +7,7 @@ const route = document.querySelector('.hero-visual .route');
 const routeMarker = document.querySelector('.hero-visual .route-marker');
 const processSteps = document.querySelectorAll('.steps li');
 const manifestoDot = document.querySelector('.manifesto-dot');
-let routeFrame;
+let scrollFrame;
 let previousScrollY = scrollY;
 
 const updateSmartHeader = () => {
@@ -32,11 +32,10 @@ const updateSmartHeader = () => {
 
 const updateProgress = () => {
   const available = document.documentElement.scrollHeight - innerHeight;
-  progress.style.width = `${available ? (scrollY / available) * 100 : 0}%`;
+  progress.style.transform = `scaleX(${available ? scrollY / available : 0})`;
 };
 
 const updateRouteMarker = () => {
-  routeFrame = undefined;
   if (!hero || !route || !routeMarker) return;
 
   const travelDistance = Math.max(hero.offsetHeight - innerHeight * 0.15, 1);
@@ -44,10 +43,6 @@ const updateRouteMarker = () => {
   const point = route.getPointAtLength(route.getTotalLength() * amount);
   routeMarker.setAttribute('cx', point.x);
   routeMarker.setAttribute('cy', point.y);
-};
-
-const requestRouteUpdate = () => {
-  if (!routeFrame) routeFrame = requestAnimationFrame(updateRouteMarker);
 };
 
 const updateStepAnimations = () => {
@@ -72,25 +67,22 @@ const updateManifestoDot = () => {
   manifestoDot.style.setProperty('--dot-progress', amount.toFixed(3));
 };
 
-addEventListener('scroll', () => {
+const updateScrollAnimations = () => {
+  scrollFrame = undefined;
   updateProgress();
   updateSmartHeader();
-  requestRouteUpdate();
+  updateRouteMarker();
   updateStepAnimations();
   updateManifestoDot();
-}, { passive: true });
-addEventListener('resize', () => {
-  updateProgress();
-  updateSmartHeader();
-  requestRouteUpdate();
-  updateStepAnimations();
-  updateManifestoDot();
-});
-updateProgress();
-updateSmartHeader();
-updateRouteMarker();
-updateStepAnimations();
-updateManifestoDot();
+};
+
+const requestScrollUpdate = () => {
+  if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollAnimations);
+};
+
+addEventListener('scroll', requestScrollUpdate, { passive: true });
+addEventListener('resize', requestScrollUpdate, { passive: true });
+updateScrollAnimations();
 
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
@@ -123,7 +115,9 @@ document.querySelectorAll('.flip-object').forEach(card => {
 document.querySelectorAll('.dot-arena').forEach(arena => {
   const dot = arena.querySelector('.escape-dot');
   const radius = 16;
-  const state = { x: 0, y: 0, vx: 0, vy: 0, lastX: 0, lastY: 0, lastTime: 0, ready: false };
+  const state = { x: 0, y: 0, vx: 0, vy: 0, lastX: 0, lastY: 0, lastTime: 0, ready: false, visible: false };
+  let animationFrame;
+  let previousTime = performance.now();
 
   const placeAtCenter = () => {
     if (state.ready) return;
@@ -161,10 +155,12 @@ document.querySelectorAll('.dot-arena').forEach(arena => {
     state.lastX = pointerX;
     state.lastY = pointerY;
     state.lastTime = now;
+    startAnimation();
   });
 
-  let previousTime = performance.now();
   const animateDot = now => {
+    animationFrame = undefined;
+    if (!state.visible) return;
     placeAtCenter();
     const frameScale = Math.min((now - previousTime) / 16.67, 2);
     previousTime = now;
@@ -186,9 +182,27 @@ document.querySelectorAll('.dot-arena').forEach(arena => {
     state.vx *= damping;
     state.vy *= damping;
     dot.style.transform = `translate(${state.x - radius}px,${state.y - radius}px)`;
-    requestAnimationFrame(animateDot);
+    if (Math.hypot(state.vx, state.vy) > 0.02) startAnimation();
   };
-  requestAnimationFrame(animateDot);
+
+  function startAnimation() {
+    if (!state.visible || animationFrame) return;
+    previousTime = performance.now();
+    animationFrame = requestAnimationFrame(animateDot);
+  }
+
+  const visibilityObserver = new IntersectionObserver(([entry]) => {
+    state.visible = entry.isIntersecting;
+    if (state.visible) {
+      placeAtCenter();
+      dot.style.transform = `translate(${state.x - radius}px,${state.y - radius}px)`;
+      startAnimation();
+    } else if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = undefined;
+    }
+  }, { rootMargin: '100px' });
+  visibilityObserver.observe(arena);
 });
 
 document.querySelectorAll('.draggable').forEach(object => {
