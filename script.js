@@ -5,9 +5,13 @@ const siteHeader = document.querySelector('.site-header');
 const hero = document.querySelector('.hero');
 const route = document.querySelector('.hero-visual .route');
 const routeMarker = document.querySelector('.hero-visual .route-marker');
+const hasFootstepsMarker = routeMarker?.classList.contains('footsteps-marker');
 const processSteps = document.querySelectorAll('.steps li');
 const manifestoDot = document.querySelector('.manifesto-dot');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let scrollFrame;
+let footstepsFrame;
+let footstepsStartedAt;
 let previousScrollY = scrollY;
 
 const updateSmartHeader = () => {
@@ -17,11 +21,12 @@ const updateSmartHeader = () => {
   }
 
   const movement = scrollY - previousScrollY;
+  const navigationExpanded = nav.classList.contains('open') || nav.querySelector('.variant-menu[open]');
   siteHeader.classList.toggle('nav-scrolled', scrollY > 8);
 
   if (scrollY <= 8) {
     siteHeader.classList.remove('nav-hidden');
-  } else if (movement > 2 && scrollY > siteHeader.offsetHeight && !nav.classList.contains('open')) {
+  } else if (movement > 2 && scrollY > siteHeader.offsetHeight && !navigationExpanded) {
     siteHeader.classList.add('nav-hidden');
   } else if (movement < -2) {
     siteHeader.classList.remove('nav-hidden');
@@ -35,21 +40,76 @@ const updateProgress = () => {
   progress.style.transform = `scaleX(${available ? scrollY / available : 0})`;
 };
 
+const placeRouteMarker = amount => {
+  if (!hero || !route || !routeMarker) return;
+
+  const routeLength = route.getTotalLength();
+  const distance = routeLength * Math.min(1, Math.max(0, amount));
+  const point = route.getPointAtLength(distance);
+
+  if (hasFootstepsMarker) {
+    const before = route.getPointAtLength(Math.max(0, distance - 2));
+    const after = route.getPointAtLength(Math.min(routeLength, distance + 2));
+    const angle = Math.atan2(after.y - before.y, after.x - before.x) * 180 / Math.PI + 90;
+    routeMarker.setAttribute('transform', `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)}) rotate(${angle.toFixed(2)})`);
+    return;
+  }
+
+  routeMarker.setAttribute('cx', point.x);
+  routeMarker.setAttribute('cy', point.y);
+};
+
 const updateRouteMarker = () => {
   if (!hero || !route || !routeMarker) return;
 
+  if (hasFootstepsMarker) {
+    if (reducedMotion.matches) {
+      routeMarker.style.opacity = '1';
+      placeRouteMarker(.45);
+    }
+    return;
+  }
+
   const travelDistance = Math.max(hero.offsetHeight - innerHeight * 0.15, 1);
-  const amount = Math.min(1, Math.max(0, (scrollY - hero.offsetTop) / travelDistance));
-  const point = route.getPointAtLength(route.getTotalLength() * amount);
-  routeMarker.setAttribute('cx', point.x);
-  routeMarker.setAttribute('cy', point.y);
+  placeRouteMarker((scrollY - hero.offsetTop) / travelDistance);
+};
+
+const updateFootstepsAnimation = timestamp => {
+  if (!hasFootstepsMarker || reducedMotion.matches) {
+    footstepsFrame = undefined;
+    return;
+  }
+
+  if (footstepsStartedAt === undefined) footstepsStartedAt = timestamp;
+  const amount = ((timestamp - footstepsStartedAt) % 8200) / 8200;
+  const opacity = Math.min(amount / .055, (1 - amount) / .085, 1);
+  routeMarker.style.opacity = Math.max(0, opacity).toFixed(3);
+  placeRouteMarker(amount);
+  footstepsFrame = requestAnimationFrame(updateFootstepsAnimation);
+};
+
+const restartFootstepsAnimation = () => {
+  if (footstepsFrame) cancelAnimationFrame(footstepsFrame);
+  footstepsFrame = undefined;
+  footstepsStartedAt = undefined;
+
+  if (!hasFootstepsMarker) return;
+  if (reducedMotion.matches) {
+    routeMarker.style.opacity = '1';
+    placeRouteMarker(.45);
+    return;
+  }
+
+  footstepsFrame = requestAnimationFrame(updateFootstepsAnimation);
 };
 
 const updateStepAnimations = () => {
   processSteps.forEach(step => {
     const rect = step.getBoundingClientRect();
     const distance = innerHeight * 0.62;
-    const amount = Math.min(1, Math.max(0, (innerHeight * 0.82 - rect.top) / distance));
+    const amount = reducedMotion.matches
+      ? 1
+      : Math.min(1, Math.max(0, (innerHeight * 0.82 - rect.top) / distance));
     step.style.setProperty('--step-progress', amount.toFixed(3));
     step.classList.toggle('phase-one', amount > 0.16);
     step.classList.toggle('phase-two', amount > 0.43);
@@ -82,7 +142,12 @@ const requestScrollUpdate = () => {
 
 addEventListener('scroll', requestScrollUpdate, { passive: true });
 addEventListener('resize', requestScrollUpdate, { passive: true });
+reducedMotion.addEventListener('change', () => {
+  requestScrollUpdate();
+  restartFootstepsAnimation();
+});
 updateScrollAnimations();
+restartFootstepsAnimation();
 
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
@@ -104,9 +169,33 @@ menuButton.addEventListener('click', () => {
 
 nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   nav.classList.remove('open');
+  nav.querySelectorAll('details[open]').forEach(menu => menu.removeAttribute('open'));
   menuButton.setAttribute('aria-expanded', 'false');
   menuButton.setAttribute('aria-label', 'Open menu');
 }));
+
+document.addEventListener('click', event => {
+  document.querySelectorAll('.variant-menu[open]').forEach(menu => {
+    if (!menu.contains(event.target)) menu.removeAttribute('open');
+  });
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  document.querySelectorAll('.variant-menu[open]').forEach(menu => menu.removeAttribute('open'));
+});
+
+document.querySelectorAll('.variant-menu').forEach(menu => {
+  menu.addEventListener('toggle', () => {
+    if (!menu.open || innerWidth > 800) return;
+    const panel = menu.querySelector('.variant-menu-panel');
+    const current = panel.querySelector('[aria-current="page"]');
+    if (!current) return;
+    requestAnimationFrame(() => {
+      panel.scrollTop = current.offsetTop - panel.offsetTop - (panel.clientHeight - current.clientHeight) / 2;
+    });
+  });
+});
 
 document.querySelectorAll('.flip-object').forEach(card => {
   card.addEventListener('click', () => card.classList.toggle('flipped'));
@@ -238,11 +327,29 @@ document.querySelectorAll('.draggable').forEach(object => {
 
 const contactForm = document.querySelector('#contact-form');
 if (contactForm) {
-  contactForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const subject = encodeURIComponent(`Studio enquiry from ${data.get('name')}`);
-    const body = encodeURIComponent(`${data.get('message')}\n\nFrom: ${data.get('name')}\nEmail: ${data.get('email')}`);
-    location.href = `mailto:alex@buildtounderstand.dev?subject=${subject}&body=${body}`;
+  const storyName = document.title.split('—')[0].trim();
+  const subjectField = contactForm.elements.namedItem('_subject');
+  let versionField = contactForm.elements.namedItem('website_version');
+  if (!versionField) {
+    versionField = document.createElement('input');
+    versionField.type = 'hidden';
+    versionField.name = 'website_version';
+    if (subjectField) subjectField.after(versionField);
+    else contactForm.prepend(versionField);
+  }
+  if (subjectField) subjectField.value = `New enquiry — ${storyName}`;
+  versionField.value = storyName;
+
+  window.formspree = window.formspree || function () {
+    (window.formspree.q = window.formspree.q || []).push(arguments);
+  };
+  window.formspree('initForm', {
+    formElement: '#contact-form',
+    formId: 'mbgllzjy',
+    useDefaultStyles: false,
+    data: {
+      source: 'Build to Understand Studio website',
+      page: () => location.pathname
+    }
   });
 }
