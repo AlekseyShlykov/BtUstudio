@@ -640,4 +640,14 @@
     min-height:0;
     transform:none;
   }
+  .home-image-variant .hero-visual{
+    width:calc(100% + 48px);
+    max-width:none;
+    margin-right:-24px;
+    margin-left:-24px;
+  }
+  .home-image-variant .lede{
+    padding-left:0!important;
+    border-left:0!important;
+  }
 }
