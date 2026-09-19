@@ -198,9 +198,15 @@ const syncCoverOverlayViewport = (overlay, image) => {
   overlay.setAttribute('viewBox', `${viewX.toFixed(3)} ${viewY.toFixed(3)} ${visibleWidth.toFixed(3)} ${visibleHeight.toFixed(3)}`);
 };
 
-document.querySelectorAll('.paper-river-route,.storm-overlay').forEach(overlay => {
+document.querySelectorAll('.paper-river-route,.storm-overlay,.archive-interaction').forEach(overlay => {
   const image = overlay.closest('.hero-visual')?.querySelector('.generated-hero');
-  const sync = () => syncCoverOverlayViewport(overlay, image);
+  const sync = () => {
+    if (overlay.classList.contains('archive-interaction') && innerWidth > 800) {
+      overlay.setAttribute('viewBox', '0 0 1536 1024');
+      return;
+    }
+    syncCoverOverlayViewport(overlay, image);
+  };
   const syncWhenReady = () => {
     sync();
     requestAnimationFrame(sync);
@@ -562,7 +568,26 @@ const updateStoryMotion = () => {
       const electronFade = 1 - clampStory((progress - .41) / .05);
       const wave = clampStory((progress - .46) / .38);
       const measurement = clampStory((progress - .62) / .28);
-      stage.style.setProperty('--electron-x', `${(44 + flight * 18.2).toFixed(2)}%`);
+      let mobileImageX = null;
+      if (innerWidth <= 800 && image?.naturalWidth) {
+        const overlay = stage.querySelector('.double-slit-overlay');
+        if (overlay) {
+          const imageRect = image.getBoundingClientRect();
+          const overlayRect = overlay.getBoundingClientRect();
+          const imageScale = Math.max(imageRect.width / image.naturalWidth, imageRect.height / image.naturalHeight);
+          const overflow = image.naturalWidth * imageScale - imageRect.width;
+          const position = parseFloat(getComputedStyle(image).objectPosition) / 100;
+          mobileImageX = sourceX => ((imageRect.left + sourceX * imageScale - overflow * position - overlayRect.left) / overlayRect.width * 100).toFixed(2) + '%';
+        }
+      }
+      stage.style.setProperty('--electron-x', mobileImageX ? mobileImageX(590 + flight * 444) : `${(44 + flight * 18.2).toFixed(2)}%`);
+      if (mobileImageX) {
+        stage.style.setProperty('--wave-x', mobileImageX(1070));
+        stage.style.setProperty('--measurement-x', mobileImageX(1490));
+      } else {
+        stage.style.removeProperty('--wave-x');
+        stage.style.removeProperty('--measurement-x');
+      }
       stage.style.setProperty('--electron-y', '42%');
       stage.style.setProperty('--wave-y', '42%');
       stage.style.setProperty('--electron-scale', (1 + Math.sin(flight * Math.PI) * .48).toFixed(3));
