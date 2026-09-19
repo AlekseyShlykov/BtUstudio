@@ -1,0 +1,20 @@
+# Build to Understand Studio
+
+> Build to Understand Studio creates educational games and interactive longreads for museums, universities and media.
+
+The studio researches a subject, develops three interactive approaches, and finishes the chosen idea for the audience and channel. The seven home-page stories use different visual styles but describe the same studio and services. The Map version at the site root is the main version.
+
+## Main pages
+
+- [Home and how we work](https://buildtounderstand.com/): Studio introduction, process, and project enquiry form.
+- [Cases](https://buildtounderstand.com/cases.html): Selected interactive philosophy, neuroscience, decision-making, and history projects.
+- [Team](https://buildtounderstand.com/team.html): People and collaboration approach.
+
+## Optional visual stories
+
+- [Archive](https://buildtounderstand.com/archive.html): Archive-themed visual version.
+- [Origami](https://buildtounderstand.com/origami.html): Paper-city visual version.
+- [Scifi](https://buildtounderstand.com/scifi.html): Futuristic-city visual version.
+- [Fantasy](https://buildtounderstand.com/fantasy.html): Fantasy-realm visual version.
+- [Detective](https://buildtounderstand.com/detective.html): Investigation-themed visual version.
+- [Science](https://buildtounderstand.com/science.html): Double-slit-experiment visual version.

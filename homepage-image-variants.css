@@ -651,3 +651,17 @@
     border-left:0!important;
   }
 }
+
+/* The hero accent rule belongs only to the Archive, Origami and Scifi stories. */
+.home-image-variant:not(.home-image-variant-40):not(.home-image-variant-51):not(.home-image-variant-53) .lede{
+  border-left:0;
+}
+
+.home-image-variant .manifesto-break{display:block;height:0}
+.home-image-variant .steps li{border:0}
+
+@media(max-width:800px){
+  .home-image-variant .choice-grid,
+  .home-image-variant .choice-grid article+article{border:0}
+  .home-image-variant .manifesto-break{height:.18em}
+}
