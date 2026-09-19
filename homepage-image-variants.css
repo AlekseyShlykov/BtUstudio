@@ -423,8 +423,8 @@
 .home-image-variant-51 .process-art-2.single-process-frame{background:#c6b7a8}
 .home-image-variant-51 .process-art-2.single-process-frame img,
 .home-image-variant-51 .steps li:hover .process-art-2.single-process-frame img{
-  object-fit:contain;
-  transform:translateY(8%) scale(1.9)!important;
+  object-fit:cover;
+  transform:none!important;
 }
 .home-image-variant-53 .single-process-frame img{object-position:center 24%}
 .home-image-variant-54 .process-art-1.single-process-frame img{object-position:center}
