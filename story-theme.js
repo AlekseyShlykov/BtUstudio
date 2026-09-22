@@ -36,9 +36,11 @@
 
   document.body.classList.add('home-image-variant', `home-image-variant-${stories[story].variant}`);
   document.body.dataset.story = story;
-  document.querySelector('[data-story-favicon]')?.setAttribute('href', `assets/favicons/${story}.svg`);
-  document.querySelector('[data-story-favicon-png]')?.setAttribute('href', `assets/favicons/${story}-64.png`);
-  document.querySelector('[data-story-touch-icon]')?.setAttribute('href', `assets/favicons/${story}-180.png`);
+  const faviconVersion = '20260922-1';
+  document.querySelector('[data-story-favicon-small]')?.setAttribute('href', `assets/favicons/${story}-32.png?v=${faviconVersion}`);
+  document.querySelector('[data-story-favicon-png]')?.setAttribute('href', `assets/favicons/${story}-64.png?v=${faviconVersion}`);
+  document.querySelector('[data-story-favicon]')?.setAttribute('href', `assets/favicons/${story}-512.png?v=${faviconVersion}`);
+  document.querySelector('[data-story-touch-icon]')?.setAttribute('href', `assets/favicons/${story}-180.png?v=${faviconVersion}`);
   const themeColors = { map: '#07182a', archive: '#141515', origami: '#ece7dd', scifi: '#050b15', fantasy: '#080706', detective: '#0b0908', science: '#071b27' };
   document.querySelector('[data-story-theme-color]')?.setAttribute('content', themeColors[story]);
 
