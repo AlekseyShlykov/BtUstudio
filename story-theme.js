@@ -36,7 +36,7 @@
 
   document.body.classList.add('home-image-variant', `home-image-variant-${stories[story].variant}`);
   document.body.dataset.story = story;
-  const faviconVersion = '20260922-1';
+  const faviconVersion = '20260922-2';
   document.querySelector('[data-story-favicon-small]')?.setAttribute('href', `assets/favicons/${story}-32.png?v=${faviconVersion}`);
   document.querySelector('[data-story-favicon-png]')?.setAttribute('href', `assets/favicons/${story}-64.png?v=${faviconVersion}`);
   document.querySelector('[data-story-favicon]')?.setAttribute('href', `assets/favicons/${story}-512.png?v=${faviconVersion}`);
