@@ -347,6 +347,10 @@ if (contactForm) {
     formElement: '#contact-form',
     formId: 'mbgllzjy',
     useDefaultStyles: false,
+    onSuccess: context => {
+      window.BTUAnalytics?.trackGenerateLead('contact_form');
+      context.form.reset();
+    },
     data: {
       source: 'Build to Understand Studio website',
       page: () => location.pathname
