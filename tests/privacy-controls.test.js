@@ -252,6 +252,7 @@ test('first visit shows accessible equal-choice controls without granting consen
   const settings = browser.document.querySelector('[data-btu-privacy-settings]');
   const allow = browser.document.querySelector('[data-consent-allow]');
   const deny = browser.document.querySelector('[data-consent-deny]');
+  const details = browser.document.querySelector('[data-consent-details]');
 
   assert.equal(controls.isOpen(), true);
   assert.equal(browser.calls.length, 0);
@@ -265,7 +266,11 @@ test('first visit shows accessible equal-choice controls without granting consen
   assert.equal(allow.getAttribute('aria-pressed'), 'false');
   assert.equal(deny.getAttribute('aria-pressed'), 'false');
   assert.equal(browser.document.querySelector('#btu-privacy-description').textContent, privacy.CONSENT_TEXT);
+  assert.ok(privacy.CONSENT_TEXT.length < 180);
   assert.equal(browser.document.querySelector('#btu-privacy-title').textContent, 'Privacy & cookies');
+  assert.equal(details.tagName, 'DETAILS');
+  assert.notEqual(details.open, true);
+  assert.equal(browser.document.querySelector('[data-consent-status]').hidden, true);
   assert.equal(browser.document.querySelector('[data-consent-necessary-state]').textContent, 'Always active');
   assert.equal(browser.document.querySelector('[data-consent-analytics-state]').textContent, 'Off');
   assert.equal(browser.document.activeElement, panel);
@@ -321,6 +326,7 @@ test('stored choice is applied once and settings can revoke it without reload', 
   assert.deepEqual(browser.calls, [true]);
   assert.equal(controls.isOpen(), false);
   browser.document.querySelector('[data-btu-privacy-settings]').click();
+  assert.equal(browser.document.querySelector('[data-consent-status]').hidden, false);
   assert.equal(browser.document.querySelector('[data-consent-allow]').getAttribute('aria-pressed'), 'true');
   browser.document.querySelector('[data-consent-deny]').click();
   assert.deepEqual(browser.calls, [true, false]);
@@ -442,8 +448,8 @@ test('all site pages load the consent UI assets and keep a footer control host',
   assert.ok(pages.length >= 9);
   pages.forEach(page => {
     const html = fs.readFileSync(path.join(root, page), 'utf8');
-    assert.match(html, /privacy-controls\.js\?v=20260923-cookies-1/);
-    assert.match(html, /privacy-controls\.css\?v=20260923-cookies-1/);
+    assert.match(html, /privacy-controls\.js\?v=20260924-compact-consent-1/);
+    assert.match(html, /privacy-controls\.css\?v=20260924-compact-consent-1/);
     assert.match(html, /<footer(?:\s|>)/);
   });
 });
@@ -452,6 +458,8 @@ test('privacy styles provide keyboard focus, equal choices, and mobile clearance
   const css = fs.readFileSync(path.resolve(__dirname, '../privacy-controls.css'), 'utf8');
   assert.match(css, /grid-template-columns:\s*1fr 1fr/);
   assert.match(css, /\.btu-privacy-categories/);
+  assert.match(css, /\.btu-privacy-details/);
+  assert.match(css, /width:\s*min\(520px/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /body\.btu-privacy-open/);
   assert.match(css, /max-height:\s*calc\(100dvh/);

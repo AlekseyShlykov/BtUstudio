@@ -22,10 +22,10 @@
   const CONSENT_COOKIE_MAX_AGE = 60 * 60 * 24 * 180;
   const GRANTED = 'granted';
   const DENIED = 'denied';
-  const CONSENT_TEXT = 'We use optional analytics to understand how people use this site and whether our outreach is useful. Analytics is off until you allow it.';
-  const PRIVACY_TEXT = 'You can change your choice at any time through Privacy settings.';
-  const NECESSARY_TEXT = 'The first-party preference cookie stores only your choice for six months. Local and session storage keep this choice and short-lived page preferences. They do not contain contact form data.';
-  const ANALYTICS_TEXT = 'GA4 may set analytics cookies only after you allow it, for aggregated site and outreach reporting. Names, email and recipient identifiers are not sent. These cookies are removed if you choose Only necessary.';
+  const CONSENT_TEXT = 'A necessary cookie remembers your choice. With your permission, GA4 analytics cookies measure site use and outreach effectiveness. GA4 is off until you allow it.';
+  const PRIVACY_TEXT = 'You can change this choice at any time in Privacy settings.';
+  const NECESSARY_TEXT = 'Stores only your choice for six months. Local and session storage keep short-lived site preferences; no form data.';
+  const ANALYTICS_TEXT = 'Used only after opt-in for aggregated site and outreach reporting. No names, email or recipient IDs; removed on refusal.';
 
   function isConsentDecision(value) {
     return value === GRANTED || value === DENIED;
@@ -165,6 +165,7 @@
     function updateState() {
       if (!status) return;
       status.textContent = statusText();
+      status.hidden = !decision;
       allowButton.setAttribute('aria-pressed', String(decision === GRANTED));
       denyButton.setAttribute('aria-pressed', String(decision === DENIED));
       if (analyticsCategoryStatus) {
@@ -251,7 +252,7 @@
           tabindex: '-1',
           'aria-modal': 'false',
           'aria-labelledby': 'btu-privacy-title',
-          'aria-describedby': 'btu-privacy-description btu-cookie-categories btu-privacy-detail',
+          'aria-describedby': 'btu-privacy-description',
           'aria-hidden': 'true',
           'data-btu-privacy-panel': ''
         }
@@ -272,6 +273,12 @@
         id: 'btu-privacy-description',
         text: CONSENT_TEXT
       });
+      const details = createElement('details', {
+        className: 'btu-privacy-details',
+        attributes: { 'data-consent-details': '' }
+      });
+      const detailsSummary = createElement('summary', { text: 'Cookie details' });
+      details.addEventListener('toggle', updatePageOffset);
       const categories = createElement('div', {
         className: 'btu-privacy-categories',
         id: 'btu-cookie-categories'
@@ -310,6 +317,7 @@
         id: 'btu-privacy-detail',
         text: PRIVACY_TEXT
       });
+      details.append(detailsSummary, categories, detail);
       status = createElement('p', {
         className: 'btu-privacy-status',
         attributes: { 'aria-live': 'polite', 'data-consent-status': '' }
@@ -331,7 +339,7 @@
       allowButton.addEventListener('click', () => choose(GRANTED));
       denyButton.addEventListener('click', () => choose(DENIED));
       choices.append(allowButton, denyButton);
-      panel.append(headingRow, description, categories, detail, status, choices);
+      panel.append(headingRow, description, details, status, choices);
 
       panel.addEventListener('keydown', event => {
         if (event.key === 'Escape' && decision) {

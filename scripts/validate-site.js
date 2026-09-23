@@ -6,9 +6,9 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const htmlFiles = fs.readdirSync(root).filter(file => file.endsWith('.html'));
-const analyticsTag = '<script src="analytics.js?v=20260923-cookies-1"></script>';
-const privacyScriptTag = '<script src="privacy-controls.js?v=20260923-cookies-1"></script>';
-const privacyStyleTag = '<link rel="stylesheet" href="privacy-controls.css?v=20260923-cookies-1">';
+const analyticsTag = '<script src="analytics.js?v=20260924-compact-consent-1"></script>';
+const privacyScriptTag = '<script src="privacy-controls.js?v=20260924-compact-consent-1"></script>';
+const privacyStyleTag = '<link rel="stylesheet" href="privacy-controls.css?v=20260924-compact-consent-1">';
 const publicPages = [
   'index.html',
   'archive.html',
