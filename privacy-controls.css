@@ -1,0 +1,171 @@
+.privacy-settings-button,
+.btu-privacy-close {
+  border: 0;
+  padding: 3px 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.privacy-settings-button:hover,
+.btu-privacy-close:hover {
+  text-decoration-thickness: 2px;
+}
+
+.btu-privacy-panel {
+  position: fixed;
+  z-index: 100;
+  right: clamp(16px, 3vw, 42px);
+  bottom: clamp(16px, 3vw, 34px);
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--ink, #263238);
+  background: var(--paper, #f7faf9);
+  color: var(--ink, #263238);
+  box-shadow: 10px 10px 0 rgba(38, 50, 56, .28);
+}
+
+.btu-privacy-panel[hidden] {
+  display: none;
+}
+
+.btu-privacy-panel:focus {
+  outline: 3px solid var(--red, #e0a23b);
+  outline-offset: 3px;
+}
+
+.btu-privacy-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.btu-privacy-heading h2 {
+  margin: 0;
+  font: 700 clamp(22px, 3vw, 30px)/1.15 var(--headline, Arial, sans-serif);
+}
+
+.btu-privacy-close {
+  flex: 0 0 auto;
+  font-size: 14px;
+}
+
+.btu-privacy-panel > p {
+  margin: 14px 0 0;
+}
+
+.btu-privacy-categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btu-privacy-category {
+  border: 1px solid rgba(38, 50, 56, .35);
+  padding: 14px;
+}
+
+.btu-privacy-category-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btu-privacy-category h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.btu-privacy-category p {
+  margin: 8px 0 0;
+  color: #4e5c61;
+  font-size: 13px;
+}
+
+.btu-privacy-category-state {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btu-privacy-detail {
+  color: #4e5c61;
+  font-size: 14px;
+}
+
+.btu-privacy-status {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.btu-privacy-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btu-consent-choice {
+  min-height: 48px;
+  border: 1px solid var(--ink, #263238);
+  padding: 10px 14px;
+  background: var(--surface-mid, #e8efeb);
+  color: var(--ink, #263238);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btu-consent-choice:hover,
+.btu-consent-choice:focus-visible {
+  background: var(--surface-soft, #b8d2cf);
+}
+
+.btu-consent-choice:focus-visible,
+.privacy-settings-button:focus-visible,
+.btu-privacy-close:focus-visible {
+  outline: 3px solid var(--red, #e0a23b);
+  outline-offset: 3px;
+}
+
+.btu-consent-choice[aria-pressed="true"] {
+  box-shadow: inset 0 -4px 0 var(--red, #e0a23b);
+}
+
+body.btu-privacy-open {
+  padding-bottom: calc(var(--btu-privacy-height, 0px) + 24px);
+}
+
+@media (max-width: 800px) {
+  .privacy-settings-button {
+    margin-top: 3px;
+  }
+
+  .btu-privacy-panel {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+    box-shadow: 6px 6px 0 rgba(38, 50, 56, .28);
+  }
+
+  .btu-privacy-choices {
+    grid-template-columns: 1fr;
+  }
+
+  .btu-privacy-categories {
+    grid-template-columns: 1fr;
+  }
+
+  .btu-consent-choice {
+    width: 100%;
+  }
+}

@@ -2,8 +2,8 @@
   "name": "build-to-understand-studio",
   "private": true,
   "scripts": {
-    "lint": "node --check analytics.js && node --check script.js && node --check story-theme.js",
-    "test": "node --test tests/analytics.test.js",
+    "lint": "node --check analytics.js && node --check privacy-controls.js && node --check script.js && node --check story-theme.js",
+    "test": "node --test tests/*.test.js",
     "build": "node scripts/validate-site.js"
   }
 }

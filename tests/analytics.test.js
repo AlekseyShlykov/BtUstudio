@@ -155,34 +155,18 @@ test('URL cleanup and replaceState do not create a second page_view', () => {
   assert.equal(commands(browser.win, 'config')[0][2].send_page_view, false);
 });
 
-test('delegated Calendly tracking accepts the canonical link and safe variants', () => {
-  assert.equal(analytics.isCalendlyLink('https://calendly.com/buildtounderstand/30min'), true);
-  assert.equal(analytics.isCalendlyLink('https://calendly.com/buildtounderstand/30min/?month=2026-09'), true);
-  assert.equal(analytics.isCalendlyLink('https://calendly.com/another-person/30min'), false);
-
-  const browser = createBrowser('https://buildtounderstand.com/');
-  const runtime = analytics.createAnalytics(browser.win);
-  runtime.init();
-  runtime.setConsent(true);
-  runtime.trackCalendlyClick({
-    href: 'https://calendly.com/buildtounderstand/30min?utm_source=private',
-    closest: selector => selector.includes('footer') ? {} : null
-  });
-  const events = commands(browser.win, 'event', 'calendly_click');
-  assert.equal(events.length, 1);
-  assert.deepEqual(events[0][2], {
-    link_url: 'https://calendly.com/buildtounderstand/30min',
-    placement: 'footer'
-  });
-});
-
-test('a Calendly click never generates generate_lead', () => {
-  const browser = createBrowser('https://buildtounderstand.com/');
-  const runtime = analytics.createAnalytics(browser.win);
-  runtime.init();
-  runtime.setConsent(true);
-  runtime.trackCalendlyClick({ href: analytics.CALENDLY_URL, closest: () => null });
-  assert.equal(commands(browser.win, 'event', 'generate_lead').length, 0);
+test('analytics exposes only current site capabilities', () => {
+  assert.deepEqual(Object.keys(analytics).sort(), [
+    'CAMPAIGN_SEGMENTS',
+    'MEASUREMENT_ID',
+    'UTM_KEYS',
+    'campaignFields',
+    'cleanAttributionUrl',
+    'createAnalytics',
+    'outreachEventParameters',
+    'parseOutreachAttribution',
+    'safePageLocation'
+  ]);
 });
 
 test('generate_lead requires the confirmed contact form method', () => {
@@ -196,6 +180,69 @@ test('generate_lead requires the confirmed contact form method', () => {
 
   const script = fs.readFileSync(path.resolve(__dirname, '../script.js'), 'utf8');
   assert.match(script, /onSuccess:[\s\S]*trackGenerateLead\('contact_form'\)/);
+  assert.equal((script.match(/trackGenerateLead\('contact_form'\)/g) || []).length, 1);
+  assert.doesNotMatch(script, /onError:[\s\S]*trackGenerateLead/);
+});
+
+test('cases story and hash survive cleanup and outreach has only approved fields', () => {
+  const browser = createBrowser(
+    'https://buildtounderstand.com/cases.html?story=map&utm_source=outreach&utm_medium=email&utm_campaign=btu_media&utm_content=step_2#top'
+  );
+  const runtime = analytics.createAnalytics(browser.win);
+  runtime.init();
+  runtime.setConsent(true);
+
+  assert.equal(browser.win.location.href, 'https://buildtounderstand.com/cases.html?story=map#top');
+  const events = commands(browser.win, 'event', 'outreach_landing');
+  assert.equal(events.length, 1);
+  assert.deepEqual(events[0][2], {
+    outreach_campaign: 'btu_media',
+    outreach_segment: 'media',
+    email_step: 2,
+    landing_path: '/cases.html'
+  });
+});
+
+test('invalid partial attribution is cleaned without creating analytics attribution', () => {
+  const browser = createBrowser(
+    'https://buildtounderstand.com/team.html?story=science&utm_source=outreach&utm_medium=cpc&utm_campaign=btu_media&preview=1#people'
+  );
+  const runtime = analytics.createAnalytics(browser.win);
+  runtime.init();
+
+  assert.equal(runtime.getAttribution(), null);
+  assert.equal(browser.win.location.href, 'https://buildtounderstand.com/team.html?story=science&preview=1#people');
+  assert.equal(browser.storage.values.has('btu-outreach-attribution-v1'), false);
+});
+
+test('repeat initialization and consent grants do not duplicate page events', () => {
+  const browser = createBrowser(
+    'https://buildtounderstand.com/?utm_source=outreach&utm_medium=email&utm_campaign=btu_museums&utm_content=step_0'
+  );
+  const runtime = analytics.createAnalytics(browser.win);
+  runtime.init();
+  runtime.init();
+  runtime.setConsent(true);
+  runtime.setConsent(true);
+
+  assert.equal(commands(browser.win, 'consent', 'default').length, 1);
+  assert.equal(commands(browser.win, 'config').length, 1);
+  assert.equal(commands(browser.win, 'event', 'page_view').length, 1);
+  assert.equal(commands(browser.win, 'event', 'outreach_landing').length, 1);
+  assert.equal(browser.scripts.length, 1);
+});
+
+test('withdrawing consent stops future lead events without duplicating page views', () => {
+  const browser = createBrowser('https://buildtounderstand.com/');
+  const runtime = analytics.createAnalytics(browser.win);
+  runtime.init();
+  runtime.setConsent(true);
+  runtime.setConsent(false);
+
+  assert.equal(runtime.trackGenerateLead('contact_form'), false);
+  runtime.setConsent(true);
+  assert.equal(commands(browser.win, 'event', 'page_view').length, 1);
+  assert.equal(commands(browser.win, 'event', 'generate_lead').length, 0);
 });
 
 test('a blocked Google tag does not break the site-facing API', () => {

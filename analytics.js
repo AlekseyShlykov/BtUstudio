@@ -6,9 +6,13 @@
   }
 
   if (root && root.document) {
-    const analytics = library.createAnalytics(root);
-    root.BTUAnalytics = analytics;
-    analytics.init();
+    if (root.BTUAnalytics && root.BTUAnalytics.version === 1) {
+      root.BTUAnalytics.init();
+    } else {
+      const analytics = library.createAnalytics(root);
+      root.BTUAnalytics = analytics;
+      analytics.init();
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
@@ -32,7 +36,6 @@
   const SENT_STORAGE_KEY = 'btu-outreach-landing-sent-v1';
   const MAX_VALUE_LENGTH = 64;
   const MAX_PATH_LENGTH = 200;
-  const CALENDLY_URL = 'https://calendly.com/buildtounderstand/30min';
   const DENIED_CONSENT = Object.freeze({
     ad_storage: 'denied',
     analytics_storage: 'denied',
@@ -183,26 +186,6 @@
     };
   }
 
-  function isCalendlyLink(input, base) {
-    try {
-      const url = new URL(input, base || 'https://buildtounderstand.com/');
-      const normalizedPath = url.pathname.replace(/\/+$/, '');
-      return url.protocol === 'https:'
-        && url.hostname === 'calendly.com'
-        && normalizedPath === '/buildtounderstand/30min';
-    } catch {
-      return false;
-    }
-  }
-
-  function inferPlacement(link) {
-    if (!link || typeof link.closest !== 'function') return 'body';
-    if (link.closest('.site-header, header')) return 'header';
-    if (link.closest('#contact, .contact')) return 'contact';
-    if (link.closest('footer')) return 'footer';
-    return 'body';
-  }
-
   function readJson(storage, key) {
     try {
       const value = storage && storage.getItem(key);
@@ -340,26 +323,6 @@
       return gtag('event', name, parameters);
     }
 
-    function trackCalendlyClick(link) {
-      const href = link && (link.href || (link.getAttribute && link.getAttribute('href')));
-      if (!isCalendlyLink(href, win.location.href)) return false;
-      return track('calendly_click', addAttribution({
-        link_url: CALENDLY_URL,
-        placement: inferPlacement(link)
-      }));
-    }
-
-    function bindCalendlyClicks() {
-      if (!doc || typeof doc.addEventListener !== 'function') return;
-      doc.addEventListener('click', event => {
-        const target = event && event.target;
-        const link = target && typeof target.closest === 'function'
-          ? target.closest('a[href]')
-          : null;
-        if (link) trackCalendlyClick(link);
-      });
-    }
-
     function trackGenerateLead(method) {
       if (method !== 'contact_form') return false;
       return track('generate_lead', addAttribution({ method: 'contact_form' }));
@@ -396,7 +359,6 @@
         }
       }
 
-      bindCalendlyClicks();
       if (typeof win.addEventListener === 'function') {
         win.addEventListener('btu:analytics-consent', event => {
           setConsent(Boolean(event && event.detail && event.detail.granted));
@@ -406,9 +368,9 @@
     }
 
     return Object.freeze({
+      version: 1,
       init,
       setConsent,
-      trackCalendlyClick,
       trackGenerateLead,
       getAttribution: () => attribution ? { ...attribution } : null
     });
@@ -418,13 +380,11 @@
     MEASUREMENT_ID,
     UTM_KEYS,
     CAMPAIGN_SEGMENTS,
-    CALENDLY_URL,
     cleanAttributionUrl,
     parseOutreachAttribution,
     campaignFields,
     outreachEventParameters,
     safePageLocation,
-    isCalendlyLink,
     createAnalytics
   });
 });
