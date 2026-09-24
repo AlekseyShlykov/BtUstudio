@@ -78,15 +78,20 @@ test('valid museum URL maps to museums and step 0', () => {
   });
 });
 
-test('media and university campaigns map to their segments', () => {
+test('media, startup and university campaigns map to their segments', () => {
   const media = analytics.parseOutreachAttribution(
     'https://buildtounderstand.com/archive.html?utm_source=outreach&utm_medium=email&utm_campaign=btu_media&utm_content=step_2'
+  );
+  const startup = analytics.parseOutreachAttribution(
+    'https://buildtounderstand.com/?utm_source=outreach&utm_medium=email&utm_campaign=btu_startups&utm_content=step_1'
   );
   const university = analytics.parseOutreachAttribution(
     'https://buildtounderstand.com/science.html?utm_source=outreach&utm_medium=email&utm_campaign=btu_universities&utm_content=step_3'
   );
   assert.equal(media.outreachSegment, 'media');
   assert.equal(media.emailStep, 2);
+  assert.equal(startup.outreachSegment, 'startups');
+  assert.equal(startup.emailStep, 1);
   assert.equal(university.outreachSegment, 'universities');
   assert.equal(university.emailStep, 3);
 });

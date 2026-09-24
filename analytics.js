@@ -29,6 +29,7 @@
   const CAMPAIGN_SEGMENTS = Object.freeze({
     btu_media: 'media',
     btu_museums: 'museums',
+    btu_startups: 'startups',
     btu_universities: 'universities'
   });
   const ALLOWED_TERMS = new Set(Object.values(CAMPAIGN_SEGMENTS));
