@@ -22,10 +22,10 @@
   const CONSENT_COOKIE_MAX_AGE = 60 * 60 * 24 * 180;
   const GRANTED = 'granted';
   const DENIED = 'denied';
-  const CONSENT_TEXT = 'A necessary cookie remembers your choice. With your permission, GA4 analytics cookies measure site use and outreach effectiveness. GA4 is off until you allow it.';
-  const PRIVACY_TEXT = 'You can change this choice at any time in Privacy settings.';
-  const NECESSARY_TEXT = 'Stores only your choice for six months. Local and session storage keep short-lived site preferences; no form data.';
-  const ANALYTICS_TEXT = 'Used only after opt-in for aggregated site and outreach reporting. No names, email or recipient IDs; removed on refusal.';
+  const CONSENT_TEXT = 'We use optional Google Analytics cookies to measure visits and outreach. They stay off unless you allow them. A necessary cookie saves your choice.';
+  const PRIVACY_TEXT = 'Change this choice any time with Privacy settings in the footer.';
+  const NECESSARY_TEXT = 'Saves this choice for six months. Site preferences may use local or session storage.';
+  const ANALYTICS_TEXT = 'Measures visits and outreach only after you allow it. Analytics cookies are removed after refusal.';
 
   function isConsentDecision(value) {
     return value === GRANTED || value === DENIED;
@@ -186,6 +186,8 @@
       initialPrompt = isInitial === true && !decision;
       previousFocus = initialPrompt ? settingsButton : doc.activeElement;
       panel.hidden = false;
+      if (initialPrompt) panel.classList.add('btu-privacy-panel--initial');
+      else panel.classList.remove('btu-privacy-panel--initial');
       panel.setAttribute('aria-hidden', 'false');
       if (doc.body && doc.body.classList) doc.body.classList.add('btu-privacy-open');
       updateState();
@@ -260,7 +262,7 @@
       panel.hidden = true;
 
       const headingRow = createElement('div', { className: 'btu-privacy-heading' });
-      const heading = createElement('h2', { id: 'btu-privacy-title', text: 'Privacy & cookies' });
+      const heading = createElement('h2', { id: 'btu-privacy-title', text: 'Cookies' });
       closeButton = createElement('button', {
         className: 'btu-privacy-close',
         text: 'Close',
@@ -277,7 +279,7 @@
         className: 'btu-privacy-details',
         attributes: { 'data-consent-details': '' }
       });
-      const detailsSummary = createElement('summary', { text: 'Cookie details' });
+      const detailsSummary = createElement('summary', { text: 'Details' });
       details.addEventListener('toggle', updatePageOffset);
       const categories = createElement('div', {
         className: 'btu-privacy-categories',

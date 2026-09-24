@@ -17,16 +17,16 @@
 .btu-privacy-panel {
   position: fixed;
   z-index: 100;
-  right: clamp(16px, 3vw, 42px);
-  bottom: clamp(16px, 3vw, 34px);
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100dvh - 32px);
+  right: clamp(12px, 2vw, 24px);
+  bottom: clamp(12px, 2vw, 24px);
+  width: min(420px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
   overflow: auto;
-  padding: 22px;
-  border: 1px solid var(--on-dark, #f7faf9);
+  padding: 14px 16px;
+  border: 1px solid rgba(247, 250, 249, .42);
   background: var(--surface, #263238);
   color: var(--on-dark, #f7faf9);
-  box-shadow: 7px 7px 0 var(--red, #e0a23b);
+  box-shadow: none;
 }
 
 .btu-privacy-panel[hidden] {
@@ -42,12 +42,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 
 .btu-privacy-heading h2 {
   margin: 0;
-  font: 700 24px/1.15 var(--headline, Arial, sans-serif);
+  font: 700 18px/1.2 var(--headline, Arial, sans-serif);
 }
 
 .btu-privacy-close {
@@ -56,22 +56,26 @@
 }
 
 .btu-privacy-panel > p {
-  margin: 10px 0 0;
-  font-size: 15px;
-  line-height: 1.45;
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .btu-privacy-details {
-  margin-top: 10px;
+  margin-top: 8px;
   border-top: 1px solid rgba(247, 250, 249, .28);
   border-bottom: 1px solid rgba(247, 250, 249, .28);
-  padding: 8px 0;
+  padding: 6px 0;
+}
+
+.btu-privacy-panel--initial .btu-privacy-details {
+  display: none;
 }
 
 .btu-privacy-details summary {
   width: max-content;
   color: var(--red, #e0a23b);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -83,14 +87,14 @@
 
 .btu-privacy-categories {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 10px;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 6px;
 }
 
 .btu-privacy-category {
-  border: 1px solid rgba(247, 250, 249, .28);
-  padding: 11px;
+  padding: 7px 0;
+  border-top: 1px solid rgba(247, 250, 249, .18);
 }
 
 .btu-privacy-category-heading {
@@ -102,12 +106,12 @@
 
 .btu-privacy-category h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1.3;
 }
 
 .btu-privacy-category p {
-  margin: 6px 0 0;
+  margin: 3px 0 0;
   color: rgba(247, 250, 249, .78);
   font-size: 12px;
 }
@@ -119,30 +123,31 @@
 }
 
 .btu-privacy-detail {
-  margin: 9px 0 0;
+  margin: 5px 0 0;
   color: rgba(247, 250, 249, .78);
   font-size: 12px;
 }
 
 .btu-privacy-status {
   color: var(--red, #e0a23b);
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 700;
 }
 
 .btu-privacy-choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .btu-consent-choice {
-  min-height: 48px;
+  min-height: 44px;
   border: 1px solid var(--on-dark, #f7faf9);
-  padding: 9px 12px;
+  padding: 7px 9px;
   background: transparent;
   color: var(--on-dark, #f7faf9);
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -166,7 +171,7 @@
 }
 
 body.btu-privacy-open {
-  padding-bottom: calc(var(--btu-privacy-height, 0px) + 24px);
+  padding-bottom: calc(var(--btu-privacy-height, 0px) + 16px);
 }
 
 @media (max-width: 800px) {
@@ -175,26 +180,21 @@ body.btu-privacy-open {
   }
 
   .btu-privacy-panel {
-    right: 12px;
-    bottom: 12px;
-    width: calc(100vw - 24px);
-    max-height: calc(100dvh - 24px);
-    padding: 16px;
-    box-shadow: 4px 4px 0 var(--red, #e0a23b);
-  }
-
-  .btu-privacy-categories {
-    grid-template-columns: 1fr;
+    right: 10px;
+    bottom: 10px;
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+    padding: 13px 14px;
   }
 
   .btu-consent-choice {
     width: 100%;
     min-height: 44px;
-    padding: 8px;
-    font-size: 14px;
+    padding: 7px;
+    font-size: 13px;
   }
 
   .btu-privacy-heading h2 {
-    font-size: 21px;
+    font-size: 18px;
   }
 }

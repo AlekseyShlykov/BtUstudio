@@ -266,8 +266,9 @@ test('first visit shows accessible equal-choice controls without granting consen
   assert.equal(allow.getAttribute('aria-pressed'), 'false');
   assert.equal(deny.getAttribute('aria-pressed'), 'false');
   assert.equal(browser.document.querySelector('#btu-privacy-description').textContent, privacy.CONSENT_TEXT);
-  assert.ok(privacy.CONSENT_TEXT.length < 180);
-  assert.equal(browser.document.querySelector('#btu-privacy-title').textContent, 'Privacy & cookies');
+  assert.ok(privacy.CONSENT_TEXT.length < 150);
+  assert.equal(browser.document.querySelector('#btu-privacy-title').textContent, 'Cookies');
+  assert.equal(panel.classList.contains('btu-privacy-panel--initial'), true);
   assert.equal(details.tagName, 'DETAILS');
   assert.notEqual(details.open, true);
   assert.equal(browser.document.querySelector('[data-consent-status]').hidden, true);
@@ -328,6 +329,7 @@ test('stored choice is applied once and settings can revoke it without reload', 
   browser.document.querySelector('[data-btu-privacy-settings]').click();
   assert.equal(browser.document.querySelector('[data-consent-status]').hidden, false);
   assert.equal(browser.document.querySelector('[data-consent-allow]').getAttribute('aria-pressed'), 'true');
+  assert.equal(browser.document.querySelector('[data-btu-privacy-panel]').classList.contains('btu-privacy-panel--initial'), false);
   browser.document.querySelector('[data-consent-deny]').click();
   assert.deepEqual(browser.calls, [true, false]);
   assert.equal(localStorage.values.get(privacy.CONSENT_STORAGE_KEY), 'denied');
@@ -448,20 +450,22 @@ test('all site pages load the consent UI assets and keep a footer control host',
   assert.ok(pages.length >= 9);
   pages.forEach(page => {
     const html = fs.readFileSync(path.join(root, page), 'utf8');
-    assert.match(html, /privacy-controls\.js\?v=20260924-compact-consent-1/);
-    assert.match(html, /privacy-controls\.css\?v=20260924-compact-consent-1/);
+    assert.match(html, /privacy-controls\.js\?v=20260924-compact-consent-2/);
+    assert.match(html, /privacy-controls\.css\?v=20260924-compact-consent-2/);
     assert.match(html, /<footer(?:\s|>)/);
   });
 });
 
-test('privacy styles provide keyboard focus, equal choices, and mobile clearance', () => {
+test('privacy styles provide a compact, shadowless prompt with equal choices and mobile clearance', () => {
   const css = fs.readFileSync(path.resolve(__dirname, '../privacy-controls.css'), 'utf8');
-  assert.match(css, /grid-template-columns:\s*1fr 1fr/);
+  assert.match(css, /\.btu-privacy-choices[\s\S]*grid-template-columns:\s*1fr 1fr/);
   assert.match(css, /\.btu-privacy-categories/);
   assert.match(css, /\.btu-privacy-details/);
-  assert.match(css, /width:\s*min\(520px/);
+  assert.match(css, /\.btu-privacy-panel--initial \.btu-privacy-details[\s\S]*display:\s*none/);
+  assert.match(css, /width:\s*min\(420px/);
+  assert.match(css, /box-shadow:\s*none/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /body\.btu-privacy-open/);
   assert.match(css, /max-height:\s*calc\(100dvh/);
-  assert.match(css, /@media \(max-width: 800px\)[\s\S]*grid-template-columns:\s*1fr/);
+  assert.match(css, /@media \(max-width: 800px\)/);
 });
