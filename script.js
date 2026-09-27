@@ -201,6 +201,28 @@ document.querySelectorAll('.flip-object').forEach(card => {
   card.addEventListener('click', () => card.classList.toggle('flipped'));
 });
 
+document.querySelectorAll('[data-case-project][data-case-link-position]').forEach(link => {
+  link.addEventListener('click', () => {
+    window.BTUAnalytics?.trackCaseProject(
+      link.dataset.caseProject,
+      link.dataset.caseLinkPosition
+    );
+  });
+});
+
+document.querySelectorAll('a[href*="#contact"]').forEach(link => {
+  let targetsContact = false;
+  try {
+    targetsContact = new URL(link.href, location.href).hash === '#contact';
+  } catch {
+    // Malformed links are ignored instead of being sent to analytics.
+  }
+  if (!targetsContact) return;
+
+  const placement = link.closest('nav') ? 'nav' : (link.closest('footer') ? 'footer' : 'body');
+  link.addEventListener('click', () => window.BTUAnalytics?.trackContactIntent(placement));
+});
+
 document.querySelectorAll('.dot-arena').forEach(arena => {
   const dot = arena.querySelector('.escape-dot');
   const radius = 16;

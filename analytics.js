@@ -32,7 +32,42 @@
     btu_startups: 'startups',
     btu_universities: 'universities'
   });
-  const ALLOWED_TERMS = new Set(Object.values(CAMPAIGN_SEGMENTS));
+  const CAMPAIGN_HYPOTHESES = Object.freeze({
+    btu_media: Object.freeze([
+      'media_understanding_engagement',
+      'media_series_entry_point',
+      'media_audience_entry_point'
+    ]),
+    btu_museums: Object.freeze([
+      'museum_pre_visit_understanding',
+      'museum_archive_reactivation',
+      'museum_exhibition_game_entry'
+    ]),
+    btu_startups: Object.freeze([
+      'startup_b2c_product_discovery',
+      'startup_b2c_complex_product_explanation',
+      'startup_b2c_engagement_reactivation',
+      'startup_b2b_value_explanation',
+      'startup_b2b_interactive_case_study',
+      'startup_b2b_shareable_differentiation'
+    ]),
+    btu_universities: Object.freeze([
+      'university_topic_onboarding',
+      'university_understanding_check',
+      'university_game_based_research'
+    ])
+  });
+  const CASE_PROJECT_IDS = new Set([
+    'the_choice',
+    'brain_shapes_behavior',
+    'reasonable_doubt',
+    'evolution_of_civilizations'
+  ]);
+  const CASE_LINK_POSITIONS = new Set(['image', 'text']);
+  const STORY_PAGE_TYPES = new Set(['home', 'cases', 'team']);
+  const STORY_IDS = new Set(['map', 'archive', 'origami', 'scifi', 'fantasy', 'detective', 'science']);
+  const ARCHIVE_ITEM_IDS = new Set(['fern', 'mineral']);
+  const CONTACT_PLACEMENTS = new Set(['nav', 'body', 'footer']);
   const ATTRIBUTION_STORAGE_KEY = 'btu-outreach-attribution-v1';
   const SENT_STORAGE_KEY = 'btu-outreach-landing-sent-v1';
   const MAX_VALUE_LENGTH = 64;
@@ -65,7 +100,12 @@
   }
 
   function attributionSignature(attribution) {
-    return `${attribution.outreachCampaign}|${attribution.emailStep}|${attribution.landingPath}`;
+    return `${attribution.outreachCampaign}|${attribution.emailStep}|${attribution.messageHypothesisId || ''}|${attribution.landingPath}`;
+  }
+
+  function isValidMessageHypothesisId(campaign, hypothesisId) {
+    const allowedHypotheses = CAMPAIGN_HYPOTHESES[campaign];
+    return Array.isArray(allowedHypotheses) && allowedHypotheses.includes(hypothesisId);
   }
 
   function validateStoredAttribution(value) {
@@ -85,8 +125,8 @@
     if (Object.hasOwn(CAMPAIGN_SEGMENTS, value.campaignId)) {
       attribution.campaignId = value.campaignId;
     }
-    if (ALLOWED_TERMS.has(value.campaignTerm)) {
-      attribution.campaignTerm = value.campaignTerm;
+    if (isValidMessageHypothesisId(value.outreachCampaign, value.messageHypothesisId)) {
+      attribution.messageHypothesisId = value.messageHypothesisId;
     }
 
     return attribution;
@@ -119,15 +159,15 @@
     };
 
     const campaignId = getSingleValue(url.searchParams, 'utm_id');
-    const campaignTerm = getSingleValue(url.searchParams, 'utm_term');
+    const messageHypothesisId = getSingleValue(url.searchParams, 'utm_term');
 
     // These optional fields are deliberately low-cardinality allowlists. Arbitrary
     // values could be recipient or click identifiers and must never reach GA.
     if (campaignId && Object.hasOwn(CAMPAIGN_SEGMENTS, campaignId)) {
       attribution.campaignId = campaignId;
     }
-    if (campaignTerm && ALLOWED_TERMS.has(campaignTerm)) {
-      attribution.campaignTerm = campaignTerm;
+    if (isValidMessageHypothesisId(campaign, messageHypothesisId)) {
+      attribution.messageHypothesisId = messageHypothesisId;
     }
 
     return attribution;
@@ -174,15 +214,25 @@
       campaign_content: `step_${attribution.emailStep}`
     };
     if (attribution.campaignId) fields.campaign_id = attribution.campaignId;
-    if (attribution.campaignTerm) fields.campaign_term = attribution.campaignTerm;
+    if (attribution.messageHypothesisId) fields.campaign_term = attribution.messageHypothesisId;
+    return fields;
+  }
+
+  function outreachAttributionFields(attribution) {
+    const fields = {
+      outreach_campaign: attribution.outreachCampaign,
+      outreach_segment: attribution.outreachSegment,
+      email_step: attribution.emailStep
+    };
+    if (attribution.messageHypothesisId) {
+      fields.message_hypothesis_id = attribution.messageHypothesisId;
+    }
     return fields;
   }
 
   function outreachEventParameters(attribution) {
     return {
-      outreach_campaign: attribution.outreachCampaign,
-      outreach_segment: attribution.outreachSegment,
-      email_step: attribution.emailStep,
+      ...outreachAttributionFields(attribution),
       landing_path: attribution.landingPath
     };
   }
@@ -314,19 +364,50 @@
       if (!attribution) return parameters;
       return {
         ...parameters,
-        outreach_campaign: attribution.outreachCampaign,
-        email_step: attribution.emailStep
+        ...outreachAttributionFields(attribution)
       };
     }
 
     function track(name, parameters) {
       if (!consentGranted || !configured) return false;
-      return gtag('event', name, parameters);
+      return gtag('event', name, addAttribution(parameters));
     }
 
     function trackGenerateLead(method) {
       if (method !== 'contact_form') return false;
-      return track('generate_lead', addAttribution({ method: 'contact_form' }));
+      return track('generate_lead', { method: 'contact_form' });
+    }
+
+    function trackCaseProject(projectId, linkPosition) {
+      if (!CASE_PROJECT_IDS.has(projectId) || !CASE_LINK_POSITIONS.has(linkPosition)) return false;
+      return track('case_project_click', {
+        project_id: projectId,
+        link_position: linkPosition
+      });
+    }
+
+    function trackStoryShuffle(pageType, fromStory, toStory) {
+      if (!STORY_PAGE_TYPES.has(pageType) || !STORY_IDS.has(fromStory) || !STORY_IDS.has(toStory)) {
+        return false;
+      }
+      return track('story_shuffle', {
+        page_type: pageType,
+        from_story: fromStory,
+        to_story: toStory
+      });
+    }
+
+    function trackArchiveScanComplete(itemId) {
+      if (!ARCHIVE_ITEM_IDS.has(itemId)) return false;
+      return track('archive_scan_complete', {
+        interaction_id: 'archive_scanner',
+        item_id: itemId
+      });
+    }
+
+    function trackContactIntent(placement) {
+      if (!CONTACT_PLACEMENTS.has(placement)) return false;
+      return track('contact_intent', { placement });
     }
 
     function setConsent(granted) {
@@ -373,6 +454,10 @@
       init,
       setConsent,
       trackGenerateLead,
+      trackCaseProject,
+      trackStoryShuffle,
+      trackArchiveScanComplete,
+      trackContactIntent,
       getAttribution: () => attribution ? { ...attribution } : null
     });
   }

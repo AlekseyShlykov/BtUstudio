@@ -106,6 +106,7 @@
     } catch {}
 
     button.disabled = true;
+    globalThis.BTUAnalytics?.trackStoryShuffle(pageType, activeStory, targetStory);
     location.assign(target);
   });
 })();

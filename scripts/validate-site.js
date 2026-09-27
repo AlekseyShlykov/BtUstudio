@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const htmlFiles = fs.readdirSync(root).filter(file => file.endsWith('.html'));
-const analyticsTag = '<script src="analytics.js?v=20260924-compact-consent-2"></script>';
+const analyticsTag = '<script src="analytics.js?v=20260927-outreach-events-1"></script>';
 const privacyScriptTag = '<script src="privacy-controls.js?v=20260924-compact-consent-2"></script>';
 const privacyStyleTag = '<link rel="stylesheet" href="privacy-controls.css?v=20260924-compact-consent-2">';
 const publicPages = [

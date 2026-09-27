@@ -170,6 +170,7 @@ document.querySelectorAll('.archive-scanner-stage').forEach(stage => {
       result.hidden = false;
       requestAnimationFrame(() => result.classList.add('is-visible'));
       stage.dataset.scanState = 'complete';
+      window.BTUAnalytics?.trackArchiveScanComplete(cell.dataset.archiveItem);
     }, duration);
   };
 
