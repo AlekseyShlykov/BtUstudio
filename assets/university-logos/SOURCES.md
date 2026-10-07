@@ -18,3 +18,5 @@
 - `catholic-university-of-croatia-blue-transparent.png` — official blue Croatian-language logo with its white background made transparent: https://www.arhiva.unicath.hr/hks2015/wp-content/uploads/2022/07/logo_cmyk_plava_hr-1.jpg
 
 University marks may be protected by trademark or institutional brand rules. Check the relevant university's usage policy before publication.
+
+The `.webp` files matching PNG filenames are lossless WebP derivatives used by the site. They were encoded without metadata and verified after decoding against the PNG sources on both light and dark backgrounds.
