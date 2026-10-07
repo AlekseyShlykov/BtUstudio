@@ -185,3 +185,21 @@ blockquote br{display:block;content:"";margin-top:.22em}
 @media(min-width:801px){.site-header nav{gap:clamp(16px,2vw,32px)}}
 @media(max-width:800px){.variant-menu summary{justify-content:space-between;padding:3px 0}.variant-menu-panel{position:static;display:block;width:100%;max-height:min(46dvh,390px);margin-top:12px;padding:6px;overflow-y:auto;overscroll-behavior:contain;box-shadow:none}.variant-menu-panel a{padding:8px 10px}.site-header nav.open{max-height:calc(100vh - 68px);max-height:calc(100dvh - 68px);overflow-y:auto}}
 input[type="hidden"]{display:none}
+
+/* University partners */
+.universities{overflow:hidden;padding-top:clamp(48px,5vw,76px);padding-right:0!important;padding-bottom:clamp(48px,5vw,76px);padding-left:0!important;background:var(--paper)}
+.universities-heading{padding:0 var(--page-gutter,clamp(22px,7vw,120px));margin-bottom:clamp(12px,2vw,24px)}
+.universities-heading.reveal{opacity:1;transform:none}
+.universities-heading h2{max-width:1100px;margin:15px 0 25px;color:var(--ink);font:normal clamp(42px,5vw,76px)/1 var(--serif);letter-spacing:-.04em}
+.university-marquee{--logo-gap:clamp(18px,2.5vw,38px);position:relative;overflow:hidden;padding:18px 0;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.university-track{display:flex;width:max-content;will-change:transform;animation:university-scroll 42s linear -38.18s infinite}
+.university-marquee:hover .university-track{animation-play-state:paused}
+.university-list{display:flex;align-items:center;gap:var(--logo-gap);margin:0;padding:0 var(--logo-gap) 0 0;list-style:none}
+.university-logo{width:clamp(190px,19vw,270px);height:clamp(112px,11vw,146px);padding:20px 26px;display:grid;place-items:center;flex:0 0 auto;background:transparent}
+.university-logo img{display:block;width:auto;height:auto;max-width:100%;max-height:96px;object-fit:contain}
+.university-logo-portrait img{max-height:108px}
+.university-logo-croatia{padding-top:7px;padding-bottom:7px}
+.university-logo-croatia img{max-height:132px}
+@keyframes university-scroll{to{transform:translate3d(-50%,0,0)}}
+@media(max-width:800px){.universities{padding-top:44px;padding-bottom:44px}.universities-heading{padding-left:24px;padding-right:24px;margin-bottom:8px}.university-marquee{mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}.university-logo{width:190px;height:108px;padding:17px 22px}.university-logo img{max-height:74px}.university-logo-portrait img{max-height:84px}.university-logo-croatia{padding-top:6px;padding-bottom:6px}.university-logo-croatia img{max-height:96px}}
+@media(prefers-reduced-motion:reduce){.university-marquee{overflow-x:auto;mask-image:none;-webkit-mask-image:none}.university-track{animation:none!important;will-change:auto}.university-list[aria-hidden="true"]{display:none}}
